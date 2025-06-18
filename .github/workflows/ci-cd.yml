@@ -66,9 +66,9 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: mv target/site/apidocs/ docs/build/apidocs/
 
-      - name: Load CNAME file
-        if: github.ref == 'refs/heads/master'
-        run: cp docs/CNAME docs/build
+#      - name: Load CNAME file
+#        if: github.ref == 'refs/heads/master'
+#        run: cp docs/CNAME docs/build
 
       - name: Deploy Documentation (including Javadoc) to GitHub Pages
         if: github.ref == 'refs/heads/master'
