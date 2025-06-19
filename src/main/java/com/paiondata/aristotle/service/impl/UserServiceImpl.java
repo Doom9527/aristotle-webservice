@@ -17,6 +17,7 @@ package com.paiondata.aristotle.service.impl;
 
 import com.paiondata.aristotle.common.base.Message;
 import com.paiondata.aristotle.common.util.CaffeineCacheUtil;
+import com.paiondata.aristotle.common.util.RedisCacheUtil;
 import com.paiondata.aristotle.model.dto.UserDTO;
 import com.paiondata.aristotle.model.entity.User;
 import com.paiondata.aristotle.model.vo.UserVO;
@@ -60,6 +61,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private CaffeineCacheUtil caffeineCache;
+
+    @Autowired(required = false)
+    private RedisCacheUtil redisCache;
 
     /**
      * Retrieves a user view object (VO) by their unique identifier (oidcid).
@@ -219,6 +223,7 @@ public class UserServiceImpl implements UserService {
         graphUuids.forEach(uuid -> caffeineCache.deleteCache(uuid));
 
         nodeRepository.deleteByUuids(graphNodeUuids);
+        redisCache.deleteObject(graphNodeUuids);
     }
 
     /**

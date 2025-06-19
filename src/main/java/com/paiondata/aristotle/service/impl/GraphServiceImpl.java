@@ -18,6 +18,7 @@ package com.paiondata.aristotle.service.impl;
 import com.paiondata.aristotle.common.annotion.Neo4jTransactional;
 import com.paiondata.aristotle.common.base.Message;
 import com.paiondata.aristotle.common.util.CaffeineCacheUtil;
+import com.paiondata.aristotle.common.util.RedisCacheUtil;
 import com.paiondata.aristotle.mapper.GraphMapper;
 import com.paiondata.aristotle.mapper.NodeMapper;
 import com.paiondata.aristotle.model.dto.FilterQueryGraphDTO;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Service implementation for managing graphs.
@@ -74,6 +76,9 @@ public class GraphServiceImpl implements GraphService {
     @Autowired
     private CaffeineCacheUtil caffeineCache;
 
+    @Autowired(required = false)
+    private RedisCacheUtil redisCache;
+
     /**
      * Retrieves a graph view object (VO) by its UUID and filter params.
      * <p>
@@ -98,10 +103,14 @@ public class GraphServiceImpl implements GraphService {
         // generate cache key
         final String cacheKey = generateCacheKey(uuid, pageNumber, pageSize);
 
-        // if cache enabled, check if the graph is cached
+        // if cache enabled, check if the graph is cached in caffeine cache
         final Optional<GraphVO> optionalCachedGraphVO = caffeineCache.getCache(cacheKey);
         if (optionalCachedGraphVO.isPresent()) {
             return optionalCachedGraphVO.get();
+        }
+
+        if (redisCache.getCacheObject(cacheKey) != null) {
+            return redisCache.getCacheObject(cacheKey);
         }
 
         // if cache disabled or no cache found, retrieve the graph from the database
@@ -125,6 +134,8 @@ public class GraphServiceImpl implements GraphService {
 
         // if cache enabled, cache the graphVO
         caffeineCache.setCache(cacheKey, graphVO);
+
+        redisCache.setCacheObject(cacheKey, graphVO, 30, TimeUnit.MINUTES);
 
         return graphVO;
     }
@@ -186,7 +197,10 @@ public class GraphServiceImpl implements GraphService {
         nodeRepository.deleteByUuids(relatedGraphNodeUuids);
         graphRepository.deleteByUuids(uuids);
 
-        uuids.forEach(uuid -> caffeineCache.deleteCache(uuid));
+        for (String uuid : uuids) {
+            caffeineCache.deleteCache(uuid);
+            redisCache.deleteObject(uuid);
+        }
     }
 
     /**
@@ -224,6 +238,7 @@ public class GraphServiceImpl implements GraphService {
             graphMapper.updateGraphByUuid(uuid, graphUpdateDTO.getTitle(), graphUpdateDTO.getDescription(), now, tx);
 
             caffeineCache.deleteCache(uuid);
+            redisCache.deleteObject(uuid);
         } else {
             final String message = String.format(Message.GRAPH_NULL, uuid);
             LOG.error(message);

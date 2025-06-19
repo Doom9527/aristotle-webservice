@@ -21,6 +21,7 @@ import com.paiondata.aristotle.common.annotion.Neo4jTransactional;
 import com.paiondata.aristotle.common.base.Constants;
 import com.paiondata.aristotle.common.base.Message;
 import com.paiondata.aristotle.common.util.CaffeineCacheUtil;
+import com.paiondata.aristotle.common.util.RedisCacheUtil;
 import com.paiondata.aristotle.mapper.NodeMapper;
 import com.paiondata.aristotle.model.vo.NodeVO;
 import com.paiondata.aristotle.model.vo.GraphVO;
@@ -79,6 +80,9 @@ public class NodeServiceImpl implements NodeService {
     @Autowired
     private CaffeineCacheUtil caffeineCache;
 
+    @Autowired(required = false)
+    private RedisCacheUtil redisCache;
+
     /**
      * Retrieves a graph node by its UUID.
      *
@@ -133,6 +137,7 @@ public class NodeServiceImpl implements NodeService {
                 nodeCreateDTO.getNodeRelationDTO(), graphUuid, tx);
 
         caffeineCache.deleteCache(graphUuid);
+        redisCache.deleteObject(graphUuid);
 
         return nodeVOS;
     }
@@ -312,6 +317,7 @@ public class NodeServiceImpl implements NodeService {
         }
 
         caffeineCache.deleteCache(graphUuid);
+        redisCache.deleteObject(graphUuid);
 
         return nodes;
     }
@@ -410,6 +416,7 @@ public class NodeServiceImpl implements NodeService {
         nodeRepository.deleteByUuids(uuids);
 
         caffeineCache.deleteCache(graphUuid);
+        redisCache.deleteObject(graphUuid);
     }
 
     /**
@@ -447,6 +454,7 @@ public class NodeServiceImpl implements NodeService {
             nodeMapper.updateNodeByUuid(nodeUpdateDTO, current, tx);
 
             caffeineCache.deleteCache(graphUuid);
+            redisCache.deleteObject(graphUuid);
         } else {
             final String message = String.format(Message.NODE_NULL, uuid);
             LOG.error(message);
@@ -482,6 +490,7 @@ public class NodeServiceImpl implements NodeService {
         }
 
         caffeineCache.deleteCache(graphUuid);
+        redisCache.deleteObject(graphUuid);
     }
 
     /**
@@ -519,6 +528,9 @@ public class NodeServiceImpl implements NodeService {
 
         // if caffeine cache enabled, cache the graphVO in caffeine cache
         caffeineCache.setCache(cacheKey, graphVO);
+
+        // if redis cache enabled, cache the graphVO in redis cache
+        redisCache.setCacheObject(cacheKey, graphVO);
 
         return graphVO;
     }
