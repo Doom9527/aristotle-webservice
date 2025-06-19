@@ -20,6 +20,8 @@ import cn.hutool.core.lang.UUID;
 import com.paiondata.aristotle.common.annotion.Neo4jTransactional;
 import com.paiondata.aristotle.common.base.Constants;
 import com.paiondata.aristotle.common.base.Message;
+import com.paiondata.aristotle.common.util.CaffeineCacheUtil;
+import com.paiondata.aristotle.common.util.RedisCacheUtil;
 import com.paiondata.aristotle.mapper.NodeMapper;
 import com.paiondata.aristotle.model.vo.NodeVO;
 import com.paiondata.aristotle.model.vo.GraphVO;
@@ -34,7 +36,6 @@ import com.paiondata.aristotle.model.entity.Graph;
 import com.paiondata.aristotle.repository.NodeRepository;
 import com.paiondata.aristotle.service.CommonService;
 import com.paiondata.aristotle.service.NodeService;
-import lombok.AllArgsConstructor;
 
 import org.neo4j.driver.Transaction;
 import org.slf4j.Logger;
@@ -63,7 +64,6 @@ import java.util.Set;
  * This class provides methods for CRUD operations on graph nodes and their relationships.
  */
 @Service
-@AllArgsConstructor
 public class NodeServiceImpl implements NodeService {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodeServiceImpl.class);
@@ -76,6 +76,12 @@ public class NodeServiceImpl implements NodeService {
 
     @Autowired
     private NodeMapper nodeMapper;
+
+    @Autowired
+    private CaffeineCacheUtil caffeineCache;
+
+    @Autowired(required = false)
+    private RedisCacheUtil redisCache;
 
     /**
      * Retrieves a graph node by its UUID.
@@ -127,8 +133,13 @@ public class NodeServiceImpl implements NodeService {
             throw new NoSuchElementException(message);
         }
 
-        return checkInputRelationsAndBindGraphAndNode(nodeCreateDTO.getNodeDTO(),
+        final List<NodeVO> nodeVOS = checkInputRelationsAndBindGraphAndNode(nodeCreateDTO.getNodeDTO(),
                 nodeCreateDTO.getNodeRelationDTO(), graphUuid, tx);
+
+        caffeineCache.deleteCache(graphUuid);
+        redisCache.deleteObject(graphUuid);
+
+        return nodeVOS;
     }
 
     /**
@@ -305,6 +316,9 @@ public class NodeServiceImpl implements NodeService {
                     .build());
         }
 
+        caffeineCache.deleteCache(graphUuid);
+        redisCache.deleteObject(graphUuid);
+
         return nodes;
     }
 
@@ -400,6 +414,9 @@ public class NodeServiceImpl implements NodeService {
         }
 
         nodeRepository.deleteByUuids(uuids);
+
+        caffeineCache.deleteCache(graphUuid);
+        redisCache.deleteObject(graphUuid);
     }
 
     /**
@@ -420,12 +437,24 @@ public class NodeServiceImpl implements NodeService {
     @Neo4jTransactional
     @Override
     public void updateNode(final NodeUpdateDTO nodeUpdateDTO, final Transaction tx) {
+        final String graphUuid = nodeUpdateDTO.getGraphUuid();
+
+        final Optional<Graph> optionalGraph = commonService.getGraphByUuid(graphUuid);
+        if (optionalGraph.isEmpty()) {
+            final String message = String.format(Message.GRAPH_NULL, graphUuid);
+            LOG.error(message);
+            throw new NoSuchElementException(message);
+        }
+
         final String uuid = nodeUpdateDTO.getUuid();
-        final Optional<NodeVO> graphNodeByUuid = getNodeByUuid(uuid);
+        final Optional<NodeVO> nodeVO = getNodeByUuid(uuid);
         final String current = getCurrentTime();
 
-        if (graphNodeByUuid.isPresent()) {
+        if (nodeVO.isPresent()) {
             nodeMapper.updateNodeByUuid(nodeUpdateDTO, current, tx);
+
+            caffeineCache.deleteCache(graphUuid);
+            redisCache.deleteObject(graphUuid);
         } else {
             final String message = String.format(Message.NODE_NULL, uuid);
             LOG.error(message);
@@ -459,6 +488,9 @@ public class NodeServiceImpl implements NodeService {
         if (deleteList != null && !deleteList.isEmpty()) {
             validateAndDeleteRelations(deleteList, graphUuid);
         }
+
+        caffeineCache.deleteCache(graphUuid);
+        redisCache.deleteObject(graphUuid);
     }
 
     /**
@@ -484,7 +516,38 @@ public class NodeServiceImpl implements NodeService {
             throw new NoSuchElementException(message);
         }
 
-        return nodeMapper.kDegreeExpansion(graphUuid, nodeUuid, k);
+        final String cacheKey = generateCacheKey(graphUuid, k);
+
+        // if caffeine cache enabled, check if the graph is cached
+        final Optional<GraphVO> optionalCachedGraphVO = caffeineCache.getCache(cacheKey);
+        if (optionalCachedGraphVO.isPresent()) {
+            return optionalCachedGraphVO.get();
+        }
+
+        final GraphVO graphVO = nodeMapper.kDegreeExpansion(graphUuid, nodeUuid, k);
+
+        // if caffeine cache enabled, cache the graphVO in caffeine cache
+        caffeineCache.setCache(cacheKey, graphVO);
+
+        // if redis cache enabled, cache the graphVO in redis cache
+        redisCache.setCacheObject(cacheKey, graphVO);
+
+        return graphVO;
+    }
+
+    /**
+     * Generates a cache key for the k-degree expansion of a graph.
+     * <p>
+     * This method generates a cache key for the k-degree expansion of a graph by concatenating the graph UUID and the
+     * desired depth of expansion.
+     *
+     * @param uuid The UUID of the graph.
+     * @param k The desired depth of expansion.
+     *
+     * @return A string representing the cache key.
+     */
+    private String generateCacheKey(final String uuid, final int k) {
+        return String.format("%s_%d", uuid, k);
     }
 
     /**

@@ -16,6 +16,8 @@
 package com.paiondata.aristotle.service.impl;
 
 import com.paiondata.aristotle.common.base.Message;
+import com.paiondata.aristotle.common.util.CaffeineCacheUtil;
+import com.paiondata.aristotle.common.util.RedisCacheUtil;
 import com.paiondata.aristotle.model.dto.UserDTO;
 import com.paiondata.aristotle.model.entity.User;
 import com.paiondata.aristotle.model.vo.UserVO;
@@ -24,8 +26,6 @@ import com.paiondata.aristotle.repository.GraphRepository;
 import com.paiondata.aristotle.repository.UserRepository;
 import com.paiondata.aristotle.service.CommonService;
 import com.paiondata.aristotle.service.UserService;
-
-import lombok.AllArgsConstructor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
  * This class provides methods for managing users, including creating, updating, and deleting users.
  */
 @Service
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -59,6 +58,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private CommonService commonService;
+
+    @Autowired
+    private CaffeineCacheUtil caffeineCache;
+
+    @Autowired(required = false)
+    private RedisCacheUtil redisCache;
 
     /**
      * Retrieves a user view object (VO) by their unique identifier (oidcid).
@@ -214,7 +219,11 @@ public class UserServiceImpl implements UserService {
 
         userRepository.deleteByOidcids((oidcids));
         graphRepository.deleteByUuids(graphUuids);
+
+        graphUuids.forEach(uuid -> caffeineCache.deleteCache(uuid));
+
         nodeRepository.deleteByUuids(graphNodeUuids);
+        redisCache.deleteObject(graphNodeUuids);
     }
 
     /**
