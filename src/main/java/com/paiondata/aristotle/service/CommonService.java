@@ -66,4 +66,13 @@ public interface CommonService {
      * @return the created graph
      */
     Graph createAndBindGraph(GraphCreateDTO graphCreateDTO, Transaction tx);
+
+    /**
+     * Retrieves the UUIDs of nodes related to a list of graph UUIDs.
+     *
+     * @param uuids the list of UUIDs of graphs
+     *
+     * @return the list of UUIDs of nodes
+     */
+    List<String> getNodeUuidsByRelatedGraphUuids(final List<String> uuids);
 }

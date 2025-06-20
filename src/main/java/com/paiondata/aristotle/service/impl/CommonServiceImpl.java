@@ -155,6 +155,17 @@ public class CommonServiceImpl implements CommonService {
     }
 
     /**
+     * Retrieves the UUIDs of nodes related to a list of graph UUIDs.
+     *
+     * @param uuids the list of UUIDs of graphs
+     *
+     * @return the list of UUIDs of nodes
+     */
+    public List<String> getNodeUuidsByRelatedGraphUuids(final List<String> uuids) {
+        return graphRepository.getNodeUuidsByRelatedGraphUuids(uuids);
+    }
+
+    /**
      * Gets the current time in the specified format.
      *
      * @return the current time

@@ -75,7 +75,7 @@ public class GraphController {
      * If specified, it also binds the nodes with relationships.
      * The result is wrapped in a {@link Result} object with a success message and the created graph data.
      *
-     * @param graphNodeCreateDTO the {@link GraphAndNodeCreateDTO} containing the graph and node creation information
+     * @param graphAndNodeCreateDTO the {@link GraphAndNodeCreateDTO} containing the graph and node creation information
      *
      * @return a {@link Result} object containing a success message and the created graph data as {@link GraphVO}
      *
@@ -85,8 +85,8 @@ public class GraphController {
             notes = "You can create just graphs, or just graphs and nodes without binding any relations between nodes")
     @PostMapping
     public Result<GraphVO> createGraphAndBindGraphAndNode(
-            @RequestBody @Valid final GraphAndNodeCreateDTO graphNodeCreateDTO) {
-        return Result.ok(nodeService.createGraphAndBindGraphAndNode(graphNodeCreateDTO, null));
+            @RequestBody @Valid final GraphAndNodeCreateDTO graphAndNodeCreateDTO) {
+        return Result.ok(nodeService.createGraphAndBindGraphWithNode(graphAndNodeCreateDTO, null));
     }
 
     /**

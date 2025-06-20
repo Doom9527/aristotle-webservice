@@ -84,16 +84,16 @@ public class NodeServiceImpl implements NodeService {
     private RedisCacheUtil redisCache;
 
     /**
-     * Retrieves a graph node by its UUID.
+     * Retrieves a node by its UUID.
      *
-     * @param uuid the UUID of the graph node
+     * @param uuid the UUID of the node
      *
-     * @return an {@code Optional} containing the graph node if found, or an empty {@code Optional} if not found
+     * @return an {@code Optional} containing the node if found, or an empty {@code Optional} if not found
      */
     @Override
     public Optional<NodeVO> getNodeByUuid(final String uuid) {
-        final NodeVO graphNode = nodeMapper.getNodeByUuid(uuid);
-        return Optional.ofNullable(graphNode);
+        final NodeVO nodeVO = nodeMapper.getNodeByUuid(uuid);
+        return Optional.ofNullable(nodeVO);
     }
 
     /**
@@ -117,7 +117,7 @@ public class NodeServiceImpl implements NodeService {
      */
     @Neo4jTransactional
     @Override
-    public List<NodeVO> createAndBindGraphAndNode(final NodeCreateDTO nodeCreateDTO, final Transaction tx) {
+    public List<NodeVO> createNodeAndBindGraphWithNode(final NodeCreateDTO nodeCreateDTO, final Transaction tx) {
         if (tx == null) {
             final String message = Message.TRANSACTION_NULL;
             LOG.error(message);
@@ -148,13 +148,13 @@ public class NodeServiceImpl implements NodeService {
      * Checks if the provided Neo4j transaction (`tx`) is null. If it is, a `TransactionException` is thrown.
      * Creates and binds a graph using the provided `GraphCreateDTO` and the transaction.
      * Constructs a `GraphAndNodeVO` object with the UUID, title, and description of the created graph.
-     * If no node information is provided in the `graphNodeCreateDTO`, <br>
+     * If no node information is provided in the `nodeCreateDTO`, <br>
      * the method returns the constructed `GraphAndNodeVO`.
      * If node information is provided, it calls the `checkInputRelationsAndBindGraphAndNode`
      * method to create and bind the nodes and their relations.
      * Sets the created nodes in the `GraphAndNodeVO` and returns it.
      *
-     * @param graphNodeCreateDTO The DTO containing information for creating the graph and node. <br>
+     * @param graphAndNodeCreateDTO The DTO containing information for creating the graph and node. <br>
      *                           It includes the graph creation details and optional node and relation details.
      * @param tx The Neo4j transaction object used for the database operation.
      *
@@ -164,15 +164,15 @@ public class NodeServiceImpl implements NodeService {
      */
     @Override
     @Neo4jTransactional
-    public GraphVO createGraphAndBindGraphAndNode(final GraphAndNodeCreateDTO graphNodeCreateDTO,
-                                                         final Transaction tx) {
+    public GraphVO createGraphAndBindGraphWithNode(final GraphAndNodeCreateDTO graphAndNodeCreateDTO,
+                                                   final Transaction tx) {
         if (tx == null) {
             final String message = Message.TRANSACTION_NULL;
             LOG.error(message);
             throw new IllegalArgumentException(message);
         }
 
-        final Graph graph = commonService.createAndBindGraph(graphNodeCreateDTO.getGraphCreateDTO(), tx);
+        final Graph graph = commonService.createAndBindGraph(graphAndNodeCreateDTO.getGraphCreateDTO(), tx);
 
         final GraphVO graphVO = GraphVO.builder()
                 .uuid(graph.getUuid())
@@ -182,15 +182,15 @@ public class NodeServiceImpl implements NodeService {
                 .updateTime(graph.getUpdateTime())
                 .build();
 
-        if (graphNodeCreateDTO.getNodeDTO() == null) {
+        if (graphAndNodeCreateDTO.getNodeDTO() == null) {
             return graphVO;
         }
 
         final String graphUuid = graph.getUuid();
 
         final List<NodeVO> nodes = checkInputRelationsAndBindGraphAndNode(
-                graphNodeCreateDTO.getNodeDTO(),
-                graphNodeCreateDTO.getNodeRelationDTO(),
+                graphAndNodeCreateDTO.getNodeDTO(),
+                graphAndNodeCreateDTO.getNodeRelationDTO(),
                 graphUuid, tx);
 
         graphVO.setNodes(nodes);
@@ -243,7 +243,7 @@ public class NodeServiceImpl implements NodeService {
             checkIds.add(dto.getToId());
         }
 
-        final List<String> graphUuids = nodeRepository.getGraphUuidByGraphNodeUuid(checkIds);
+        final List<String> graphUuids = nodeRepository.getGraphUuidByNodeUuid(checkIds);
         for (final String uuid : graphUuids) {
             if (!uuid.equals(graphUuid)) {
                 final String message = String.format(Message.BOUND_ANOTHER_GRAPH, uuid);
@@ -325,35 +325,35 @@ public class NodeServiceImpl implements NodeService {
     /**
      * Binds node relations based on the provided DTOs.
      * <p>
-     * Checks if the provided list of {@code graphNodeRelationDTO} is null or empty. If so, it returns immediately.
+     * Checks if the provided list of {@code nodeRelationDTO} is null or empty. If so, it returns immediately.
      * Iterates over the list of {@code NodeRelationDTO} objects.
      * For each DTO, it extracts the relation name and generates a unique UUID for the new relation.
      * Retrieves the start node ID and end node ID from the provided {@code uuidMap} using <br>
      * the {@link #getNodeId(String, Map)} method.
      * Binds the start node to the end node using the <br>
-     * {@link NodeMapper#bindGraphNodeToGraphNode(String, String, String, String, String, Transaction)} method.
+     * {@link NodeMapper#bindNodeToNode(String, String, String, String, String, Transaction)} method.
      *
-     * @param graphNodeRelationDTO the list of DTOs for creating node relations. <br>
+     * @param nodeRelationDTO the list of DTOs for creating node relations. <br>
      *                             Each DTO contains the start node ID, end node ID, and relation name.
      * @param uuidMap              the map for storing UUID mappings. The keys are the original IDs, <br>
      *                            and the values are the mapped node IDs.
      * @param now                  the current timestamp
      * @param tx                   the Neo4j transaction object used for the database operation
      */
-    private void bindNodeRelations(final List<NodeRelationDTO> graphNodeRelationDTO, final Map<String, String> uuidMap,
+    private void bindNodeRelations(final List<NodeRelationDTO> nodeRelationDTO, final Map<String, String> uuidMap,
                                    final String now, final Transaction tx) {
-        if (graphNodeRelationDTO == null || graphNodeRelationDTO.isEmpty()) {
+        if (nodeRelationDTO == null || nodeRelationDTO.isEmpty()) {
             return;
         }
 
-        for (final NodeRelationDTO dto : graphNodeRelationDTO) {
+        for (final NodeRelationDTO dto : nodeRelationDTO) {
             final String relation = dto.getRelationName();
             final String relationUuid = UUID.fastUUID().toString(true);
 
             final String fromId = getNodeId(dto.getFromId(), uuidMap);
             final String toId = getNodeId(dto.getToId(), uuidMap);
 
-            nodeMapper.bindGraphNodeToGraphNode(fromId, toId, relation, relationUuid, now, tx);
+            nodeMapper.bindNodeToNode(fromId, toId, relation, relationUuid, now, tx);
         }
     }
 
