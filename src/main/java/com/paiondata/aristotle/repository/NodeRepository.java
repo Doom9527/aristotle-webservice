@@ -41,14 +41,14 @@ public interface NodeRepository extends Neo4jRepository<GraphNode, Long> {
     void deleteByUuids(List<String> uuids);
 
     /**
-     * Retrieves the UUIDs of graphs that contain the given graph nodes.
+     * Retrieves the UUIDs of graphs that contain the given nodes.
      *
-     * @param uuids the list of UUIDs of the graph nodes
+     * @param uuids the list of UUIDs of the nodes
      *
      * @return the list of UUIDs of the graphs
      */
     @Query("MATCH (g:Graph)-[r:RELATION]->(gn:GraphNode) WHERE gn.uuid in $uuids RETURN g.uuid")
-    List<String> getGraphUuidByGraphNodeUuid(Set<String> uuids);
+    List<String> getGraphUuidByNodeUuid(Set<String> uuids);
 
     /**
      * Updates the name of a relationship between a graph and a graph node.

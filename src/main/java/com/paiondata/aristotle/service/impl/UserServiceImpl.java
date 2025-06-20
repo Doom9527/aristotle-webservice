@@ -194,7 +194,7 @@ public class UserServiceImpl implements UserService {
      * the {@link CommonService#getUserByOidcid(String)} method.
      * Throws a {@link NoSuchElementException} if any user does not exist.
      * Retrieves the UUIDs of graphs related to the users using the {@link #getRelatedGraphUuids(List)} method.
-     * Retrieves the UUIDs of nodes related to the graphs using the {@link #getRelatedGraphNodeUuids(List)} method.
+     * Retrieves the UUIDs of nodes related to the graphs using the {@link CommonService#getNodeUuidsByRelatedGraphUuids(List)} method.
      * Deletes the users from the user repository using the {@link UserRepository#deleteByOidcids(List)} method.
      * Deletes the related graph from the graph repository using the {@link GraphRepository#deleteByUuids(List)} method.
      * Deletes the related nodes from the node repository using the {@link NodeRepository#deleteByUuids(List)} method.
@@ -215,15 +215,15 @@ public class UserServiceImpl implements UserService {
         }
 
         final List<String> graphUuids = getRelatedGraphUuids(oidcids);
-        final List<String> graphNodeUuids = getRelatedGraphNodeUuids(graphUuids);
+        final List<String> nodeUuids = commonService.getNodeUuidsByRelatedGraphUuids(graphUuids);
 
         userRepository.deleteByOidcids((oidcids));
         graphRepository.deleteByUuids(graphUuids);
 
         graphUuids.forEach(uuid -> caffeineCache.deleteCache(uuid));
 
-        nodeRepository.deleteByUuids(graphNodeUuids);
-        redisCache.deleteObject(graphNodeUuids);
+        nodeRepository.deleteByUuids(nodeUuids);
+        redisCache.deleteObject(nodeUuids);
     }
 
     /**
@@ -235,16 +235,5 @@ public class UserServiceImpl implements UserService {
      */
     private List<String> getRelatedGraphUuids(final List<String> userOidcids) {
         return userRepository.getGraphUuidsByUserOidcid(userOidcids);
-    }
-
-    /**
-     * Retrieves the UUIDs of related graph nodes for a list of graph UUIDs.
-     *
-     * @param graphUuids a list of graph UUIDs
-     *
-     * @return a list of related graph node UUIDs
-     */
-    private List<String> getRelatedGraphNodeUuids(final List<String> graphUuids) {
-        return graphRepository.getGraphNodeUuidsByGraphUuids(graphUuids);
     }
 }

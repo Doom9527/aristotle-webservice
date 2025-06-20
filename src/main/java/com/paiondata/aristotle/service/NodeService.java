@@ -52,16 +52,16 @@ public interface NodeService {
      *
      * @return the list of created nodes
      */
-    List<NodeVO> createAndBindGraphAndNode(NodeCreateDTO nodeCreateDTO, Transaction tx);
+    List<NodeVO> createNodeAndBindGraphWithNode(NodeCreateDTO nodeCreateDTO, Transaction tx);
 
     /**
      * Creates a graph and binds it with a node based on the provided DTO.
-     * @param graphNodeCreateDTO the DTO containing information for creating the graph and node
+     * @param graphAndNodeCreateDTO the DTO containing information for creating the graph and node
      * @param tx the Neo4j transaction
      *
      * @return the created graph node
      */
-    GraphVO createGraphAndBindGraphAndNode(GraphAndNodeCreateDTO graphNodeCreateDTO, Transaction tx);
+    GraphVO createGraphAndBindGraphWithNode(GraphAndNodeCreateDTO graphAndNodeCreateDTO, Transaction tx);
 
     /**
      * Deletes graph nodes by their UUIDs.

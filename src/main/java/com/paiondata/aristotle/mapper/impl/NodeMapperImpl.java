@@ -346,22 +346,22 @@ public class NodeMapperImpl implements NodeMapper {
     }
 
     /**
-     * Binds two graph nodes together with a specified relationship.
+     * Binds two nodes together with a specified relationship.
      * <p>
-     * Constructs a Cypher query to match two graph nodes by their UUIDs, update their update times,
+     * Constructs a Cypher query to match two nodes by their UUIDs, update their update times,
      * and create a relationship between them.
      * Executes the Cypher query using the provided transaction.
      *
-     * @param uuid1 the UUID of the first graph node
-     * @param uuid2 the UUID of the second graph node
+     * @param uuid1 the UUID of the first node
+     * @param uuid2 the UUID of the second node
      * @param relation the name of the relationship to create
      * @param relationUuid the UUID of the relationship
      * @param currentTime the current timestamp for creation and update times
      * @param tx the Neo4j transaction to execute the Cypher query
      */
     @Override
-    public void bindGraphNodeToGraphNode(final String uuid1, final String uuid2, final String relation,
-                                         final String relationUuid, final String currentTime, final Transaction tx) {
+    public void bindNodeToNode(final String uuid1, final String uuid2, final String relation,
+                               final String relationUuid, final String currentTime, final Transaction tx) {
         final String cypherQuery = "MATCH (gn1:GraphNode) WHERE gn1.uuid = $uuid1 SET gn1.update_time = $currentTime "
                 + "WITH gn1 "
                 + "MATCH (gn2:GraphNode) WHERE gn2.uuid = $uuid2 SET gn2.update_time = $currentTime "

@@ -84,8 +84,8 @@ public interface NodeMapper {
      * @param currentTime  the current timestamp
      * @param tx the Neo4j transaction
      */
-    void bindGraphNodeToGraphNode(String uuid1, String uuid2, String relation,
-                                  String relationUuid, String currentTime, Transaction tx);
+    void bindNodeToNode(String uuid1, String uuid2, String relation,
+                        String relationUuid, String currentTime, Transaction tx);
 
     /**
      * Updates a graph node by its UUID.

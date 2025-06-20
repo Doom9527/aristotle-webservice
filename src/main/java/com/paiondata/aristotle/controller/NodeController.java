@@ -129,7 +129,7 @@ public class NodeController {
      * If specified, it also binds the nodes with relationships.
      * The result is wrapped in a {@link Result} object with a success message and the list of created nodes.
      *
-     * @param graphNodeCreateDTO the {@link NodeCreateDTO} containing the node creation and binding information
+     * @param NodeCreateDTO the {@link NodeCreateDTO} containing the node creation and binding information
      *
      * @return a {@link Result} object containing a success message and a list of created nodes as {@link NodeVO}
      *
@@ -140,8 +140,8 @@ public class NodeController {
             notes = "The nodes could be created without binding any relations, "
                     + "or create relationships only on existing nodes without creating new nodes")
     @PostMapping
-    public Result<List<NodeVO>> createAndBindNode(@RequestBody @Valid final NodeCreateDTO graphNodeCreateDTO) {
-        return Result.ok(Message.CREATE_SUCCESS, nodeService.createAndBindGraphAndNode(graphNodeCreateDTO, null));
+    public Result<List<NodeVO>> createAndBindNode(@RequestBody @Valid final NodeCreateDTO NodeCreateDTO) {
+        return Result.ok(Message.CREATE_SUCCESS, nodeService.createNodeAndBindGraphWithNode(NodeCreateDTO, null));
     }
 
     /**

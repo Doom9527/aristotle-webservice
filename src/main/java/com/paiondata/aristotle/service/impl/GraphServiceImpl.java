@@ -163,7 +163,7 @@ public class GraphServiceImpl implements GraphService {
      * - Retrieves the graph by its UUID using the {@link CommonService#getGraphByUuid(String)} method.
      * - Throws a {@link NoSuchElementException} if the graph is not found.
      * - Throws a {@link IllegalStateException} if the graph is bound to another user.
-     * Retrieves the UUIDs of related graph nodes using the {@link #getRelatedGraphNodeUuids(List)} method.
+     * Retrieves the UUIDs of related graph nodes using the {@link CommonService#getNodeUuidsByRelatedGraphUuids(List)} method.
      * Deletes the related graph nodes using the {@link NodeRepository#deleteByUuids(List)} method.
      * Deletes the graphs using the {@link GraphRepository#deleteByUuids(List)} method.
      *
@@ -192,9 +192,9 @@ public class GraphServiceImpl implements GraphService {
             }
         }
 
-        final List<String> relatedGraphNodeUuids = getRelatedGraphNodeUuids(uuids);
+        final List<String> nodeUuids = commonService.getNodeUuidsByRelatedGraphUuids(uuids);
 
-        nodeRepository.deleteByUuids(relatedGraphNodeUuids);
+        nodeRepository.deleteByUuids(nodeUuids);
         graphRepository.deleteByUuids(uuids);
 
         for (String uuid : uuids) {
@@ -244,17 +244,6 @@ public class GraphServiceImpl implements GraphService {
             LOG.error(message);
             throw new NoSuchElementException(message);
         }
-    }
-
-    /**
-     * Retrieves the UUIDs of graph nodes related to a list of graph UUIDs.
-     *
-     * @param uuids the list of UUIDs of graphs
-     *
-     * @return the list of UUIDs of graph nodes
-     */
-    private List<String> getRelatedGraphNodeUuids(final List<String> uuids) {
-        return graphRepository.getGraphNodeUuidsByGraphUuids(uuids);
     }
 
     /**
