@@ -119,6 +119,11 @@ public class GraphServiceImpl implements GraphService {
         if (graphByUuid == null) {
             final String message = String.format(Message.GRAPH_NULL, uuid);
             LOG.error(message);
+
+            // Cache empty value to prevent cache miss storms
+            caffeineCache.setCache(cacheKey, null); // Or a special GraphVO.EMPTY object
+            redisCache.setCacheObject(cacheKey, null, 30, TimeUnit.MINUTES);
+
             throw new NoSuchElementException(message);
         }
 

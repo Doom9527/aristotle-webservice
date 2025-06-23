@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Service implementation for managing graph nodes.
@@ -524,7 +525,22 @@ public class NodeServiceImpl implements NodeService {
             return optionalCachedGraphVO.get();
         }
 
+        if (redisCache.getCacheObject(cacheKey) != null) {
+            return redisCache.getCacheObject(cacheKey);
+        }
+
         final GraphVO graphVO = nodeMapper.kDegreeExpansion(graphUuid, nodeUuid, k);
+
+        if (graphVO == null) {
+            final String message = String.format(Message.GRAPH_NULL, graphUuid);
+            LOG.error(message);
+
+            // Cache empty value to prevent cache miss storms
+            caffeineCache.setCache(cacheKey, null); // Or a special GraphVO.EMPTY object
+            redisCache.setCacheObject(cacheKey, null, 30, TimeUnit.MINUTES);
+
+            throw new NoSuchElementException(message);
+        }
 
         // if caffeine cache enabled, cache the graphVO in caffeine cache
         caffeineCache.setCache(cacheKey, graphVO);
