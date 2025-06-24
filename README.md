@@ -31,8 +31,8 @@ The use and distribution terms for [Aristotle] are covered by the [Apache Licens
 [Apache License, Version 2.0]: http://www.apache.org/licenses/LICENSE-2.0.html
 [Docker Compose badge]: https://img.shields.io/badge/Docker%20Compose-2596EC?style=for-the-badge&logo=docker&logoColor=white
 
-[Aristotle]: https://github.com/paion-data/aristotle
-[Documentation]: https://aristotle-ws.com
+[Aristotle]: https://github.com/Doom9527/aristotle-webservice
+[Documentation]: https://doom9527.github.io/aristotle-webservice/
 
 [Neo4j]: https://neo4j.com
 
