@@ -1,0 +1,45 @@
+<svg width="100%" height="100%" viewBox="0 0 1440 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g opacity="0.9">
+    <circle cx="120" cy="80" r="6" fill="#fff"/>
+    <circle cx="400" cy="120" r="8" fill="#fff"/>
+    <circle cx="700" cy="60" r="5" fill="#fff"/>
+    <circle cx="1100" cy="180" r="7" fill="#fff"/>
+    <circle cx="1300" cy="90" r="6" fill="#fff"/>
+    <circle cx="900" cy="300" r="8" fill="#fff"/>
+    <circle cx="300" cy="320" r="7" fill="#fff"/>
+    <circle cx="600" cy="200" r="6" fill="#fff"/>
+    <circle cx="1000" cy="60" r="5" fill="#fff"/>
+    <circle cx="200" cy="200" r="5" fill="#fff"/>
+    <circle cx="800" cy="100" r="5" fill="#fff"/>
+    <circle cx="500" cy="250" r="6" fill="#fff"/>
+    <circle cx="1250" cy="250" r="6" fill="#fff"/>
+    <circle cx="1150" cy="350" r="5" fill="#fff"/>
+    <circle cx="350" cy="60" r="4" fill="#fff"/>
+    <circle cx="1400" cy="350" r="5" fill="#fff"/>
+    <circle cx="100" cy="350" r="5" fill="#fff"/>
+    <line x1="120" y1="80" x2="400" y2="120" stroke="#fff" stroke-width="2.5"/>
+    <line x1="400" y1="120" x2="700" y2="60" stroke="#fff" stroke-width="2.5"/>
+    <line x1="700" y1="60" x2="1100" y2="180" stroke="#fff" stroke-width="2.5"/>
+    <line x1="1100" y1="180" x2="1300" y2="90" stroke="#fff" stroke-width="2.5"/>
+    <line x1="1300" y1="90" x2="900" y2="300" stroke="#fff" stroke-width="2.5"/>
+    <line x1="900" y1="300" x2="300" y2="320" stroke="#fff" stroke-width="2.5"/>
+    <line x1="300" y1="320" x2="600" y2="200" stroke="#fff" stroke-width="2.5"/>
+    <line x1="600" y1="200" x2="1000" y2="60" stroke="#fff" stroke-width="2.5"/>
+    <line x1="1000" y1="60" x2="200" y2="200" stroke="#fff" stroke-width="2.5"/>
+    <line x1="200" y1="200" x2="120" y2="80" stroke="#fff" stroke-width="2.5"/>
+    <line x1="800" y1="100" x2="1000" y2="60" stroke="#fff" stroke-width="2.5"/>
+    <line x1="800" y1="100" x2="900" y2="300" stroke="#fff" stroke-width="2.5"/>
+    <line x1="800" y1="100" x2="1100" y2="180" stroke="#fff" stroke-width="2.5"/>
+    <line x1="500" y1="250" x2="600" y2="200" stroke="#fff" stroke-width="2.5"/>
+    <line x1="500" y1="250" x2="300" y2="320" stroke="#fff" stroke-width="2.5"/>
+    <line x1="1250" y1="250" x2="1300" y2="90" stroke="#fff" stroke-width="2.5"/>
+    <line x1="1250" y1="250" x2="1150" y2="350" stroke="#fff" stroke-width="2.5"/>
+    <line x1="1150" y1="350" x2="900" y2="300" stroke="#fff" stroke-width="2.5"/>
+    <line x1="350" y1="60" x2="400" y2="120" stroke="#fff" stroke-width="2.5"/>
+    <line x1="350" y1="60" x2="120" y2="80" stroke="#fff" stroke-width="2.5"/>
+    <line x1="1400" y1="350" x2="1300" y2="90" stroke="#fff" stroke-width="2.5"/>
+    <line x1="1400" y1="350" x2="1250" y2="250" stroke="#fff" stroke-width="2.5"/>
+    <line x1="100" y1="350" x2="120" y2="80" stroke="#fff" stroke-width="2.5"/>
+    <line x1="100" y1="350" x2="300" y2="320" stroke="#fff" stroke-width="2.5"/>
+  </g>
+</svg> 
