@@ -17,7 +17,7 @@ function HomepageHeader() {
         <Heading as="h1" className="hero__title">
           Aristotle
         </Heading>
-        <p className="hero__subtitle">开箱即用的知识图谱API服务，支持Neo4j，灵活可扩展</p>
+        <p className="hero__subtitle">基于Neo4j，开箱即用的知识图谱API服务，灵活可扩展</p>
         <div className={styles.buttons}>
           <Link
             className={clsx('button', styles['button--main'])}
@@ -32,7 +32,7 @@ function HomepageHeader() {
           </Link>
         </div>
         <div className={styles.license}>
-          <span>本项目基于 <b>Apache 2.0</b> 开源协议发布</span>
+          <span>项目基于 <b>Apache 2.0</b> 开源协议发布</span>
         </div>
       </div>
     </header>

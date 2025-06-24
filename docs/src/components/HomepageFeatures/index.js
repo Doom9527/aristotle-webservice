@@ -8,7 +8,7 @@ const FeatureList = [
     Svg: require('@site/static/img/logo.svg').default,
     description: (
       <>
-        Aristotle Webservice 提供标准化的知识图谱API，支持Neo4j，轻松集成到你的业务系统。
+        Aristotle Webservice 基于Neo4j提供标准化的知识图谱API，轻松集成到你的业务系统。
       </>
     ),
   },

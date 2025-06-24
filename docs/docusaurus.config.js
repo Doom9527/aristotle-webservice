@@ -96,7 +96,10 @@ const config = {
             position: 'left',
             label: '快速开始',
           },
-          {to: '/blog', label: '博客', position: 'left'},
+          {
+            label: '博客',
+            href: 'https://doom9527.github.io/blog/',
+          },
           {
             href: 'https://github.com/Doom9527/aristotle-webservice',
             label: 'GitHub 仓库',
