@@ -14,7 +14,7 @@ function HomepageHeader() {
       <div className="container">
         <img src="/img/logo.svg" alt="logo" style={{width: 90, marginBottom: 16}} />
         <Heading as="h1" className="hero__title">
-          Aristotle Webservice
+          Aristotle
         </Heading>
         <p className="hero__subtitle">开箱即用的知识图谱API服务，支持Neo4j，灵活可扩展</p>
         <div className={styles.buttons}>
