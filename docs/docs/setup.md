@@ -1,77 +1,64 @@
 ---
-sidebar_position: 2
-title: Setup
+sidebar_position: 1
+title: 快速开始
 ---
 
-This section discusses the one-time setup in order to develop [Aristotle].
+# 快速开始
 
-Prepare for Local Development
------------------------------
+欢迎使用 Aristotle 知识图谱服务！本指南将帮助你在几分钟内完成本地环境的搭建与服务启动。
 
-### Installing Java & Maven (on Mac)
+## 1. 环境准备
 
-```bash
-brew update
-brew install openjdk@17
-```
+- **JDK 17+**
+- **Maven 3.6+**
+- **Neo4j 4.x/5.x**（本地或远程均可）
+- （可选）**Docker**
 
-At the end of the last command prompt, something like the below will show up:
-
-```bash
-For the system Java wrappers to find this JDK, symlink it with
-  sudo ln -sfn ...openjdk@17/libexec/openjdk.jdk .../JavaVirtualMachines/openjdk-17.jdk
-
-openjdk@17 is keg-only, which means it was not symlinked into /usr/local,
-because this is an alternate version of another formula.
-
-If you need to have openjdk@17 first in your PATH, run:
-  echo 'export PATH=".../openjdk@17/bin:$PATH"' >> .../.bash_profile
-
-For compilers to find openjdk@17 you may need to set:
-  export CPPFLAGS="-I.../openjdk@17/include"
-```
-
-Make sure to execute the `sudo ln -sfn`, `echo 'export PATH=...`, and the `export CPPFLAGS=` commands above
-
-:::tip
-
-Maven uses a separate JDK version, which can be seen via `mvn -v`. If it's not JDK 17, we should have Maven point
-to our JDK 17 using [JAVA_HOME](https://stackoverflow.com/a/2503679):
+## 2. 获取代码
 
 ```bash
-$ /usr/libexec/java_home
-/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home
-
-$ export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home
+git clone https://github.com/Doom9527/aristotle-webservice.git
+cd aristotle-webservice
 ```
 
-:::
+## 3. 配置数据库
 
-If we see something similar after typing the command with the version flag below we're good to go
+编辑 `src/main/resources/application.yaml`，根据你的 Neo4j 实例修改如下配置：
+
+```yaml
+spring:
+  data:
+    neo4j:
+      uri: bolt://localhost:7687
+      database: neo4j
+      username: neo4j
+      password: 12345678
+```
+
+## 4. 启动服务
+
+### 方式一：Maven
 
 ```bash
-$ java --version
-openjdk 17.0.10 2021-01-19
-OpenJDK Runtime Environment (build 17.0.10+9)
-OpenJDK 64-Bit Server VM (build 17.0.10+9, mixed mode)
+./mvnw spring-boot:run
 ```
 
-### Installing Docker Engine
-
-<!-- markdown-link-check-disable -->
-[Aristotle] has [Docker-based integration tests];
-Docker can be installed by following its
-[official instructions](https://docs.docker.com/desktop/install/mac-install/)
-<!-- markdown-link-check-enable -->
-
-Getting Source Code
--------------------
+### 方式二：Docker
 
 ```bash
-git clone git@github.com:paion-data/aristotle.git
-cd aristotle
+docker compose up
 ```
 
-[Aristotle]: https://github.com/paion-data/aristotle/
+## 5. 访问 API 文档
 
-[Docker-based integration tests]: https://github.com/paion-data/aristotle/blob/master/src/test/groovy/com/paiondata/aristotle/DockerComposeITSpec.groovy
+服务启动后，访问 [http://localhost:8080/doc.html](http://localhost:8080/doc.html) 查看接口文档。
+
+## 6. 常见问题
+
+- 端口被占用？请检查 8080 端口是否被其他服务占用。
+- Neo4j 连接失败？请确认数据库配置和网络连通性。
+
+## 7. 参考
+
+- [GitHub 仓库](https://github.com/Doom9527/aristotle-webservice)
+- [项目主页](https://doom9527.github.io/blog/)

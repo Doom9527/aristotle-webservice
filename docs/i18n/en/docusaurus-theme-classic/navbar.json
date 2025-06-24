@@ -1,0 +1,22 @@
+{
+  "title": {
+    "message": "Aristotle",
+    "description": "The title in the navbar"
+  },
+  "logo.alt": {
+    "message": "Aristotle Logo",
+    "description": "The alt text of navbar logo"
+  },
+  "item.label.快速开始": {
+    "message": "快速开始",
+    "description": "Navbar item with label 快速开始"
+  },
+  "item.label.博客": {
+    "message": "博客",
+    "description": "Navbar item with label 博客"
+  },
+  "item.label.GitHub 仓库": {
+    "message": "GitHub 仓库",
+    "description": "Navbar item with label GitHub 仓库"
+  }
+}

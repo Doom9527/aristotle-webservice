@@ -12,16 +12,26 @@ function HomepageHeader() {
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
+        <img src="/img/logo.svg" alt="logo" style={{width: 90, marginBottom: 16}} />
         <Heading as="h1" className="hero__title">
-          {siteConfig.title}
+          Aristotle Webservice
         </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <p className="hero__subtitle">开箱即用的知识图谱API服务，支持Neo4j，灵活可扩展</p>
         <div className={styles.buttons}>
           <Link
-            className="button button--secondary button--lg"
+            className={clsx('button', styles['button--main'])}
             to="/docs/setup">
-            Docusaurus Tutorial - 5min ⏱️
+            快速开始
           </Link>
+          <Link
+            className={clsx('button', styles['button--github'])}
+            to="https://github.com/Doom9527/aristotle-webservice"
+            target="_blank">
+            GitHub 仓库
+          </Link>
+        </div>
+        <div className={styles.license}>
+          <span>本项目基于 <b>Apache 2.0</b> 开源协议发布</span>
         </div>
       </div>
     </header>

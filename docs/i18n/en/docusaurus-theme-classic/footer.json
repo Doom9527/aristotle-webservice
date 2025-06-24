@@ -1,0 +1,26 @@
+{
+  "link.title.文档": {
+    "message": "文档",
+    "description": "The title of the footer links column with title=文档 in the footer"
+  },
+  "link.title.社区": {
+    "message": "社区",
+    "description": "The title of the footer links column with title=社区 in the footer"
+  },
+  "link.item.label.快速开始": {
+    "message": "快速开始",
+    "description": "The label of footer link with label=快速开始 linking to /docs/setup"
+  },
+  "link.item.label.博客": {
+    "message": "博客",
+    "description": "The label of footer link with label=博客 linking to https://doom9527.github.io/blog/"
+  },
+  "link.item.label.GitHub 仓库": {
+    "message": "GitHub 仓库",
+    "description": "The label of footer link with label=GitHub 仓库 linking to https://github.com/Doom9527/aristotle-webservice"
+  },
+  "copyright": {
+    "message": "Copyright © 2025 Aristotle. 本项目基于 Apache 2.0 协议开源。",
+    "description": "The footer copyright"
+  }
+}

@@ -4,32 +4,29 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: '灵活的知识图谱API',
+    Svg: require('@site/static/img/logo.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Aristotle Webservice 提供标准化的知识图谱API，支持Neo4j，轻松集成到你的业务系统。
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: '可扩展与高性能',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        支持大规模数据与高并发访问，缓存与分布式设计助力企业级应用。
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: '开源与开放',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        完全开源，Apache 2.0协议，欢迎社区共建与二次开发。
       </>
     ),
   },
