@@ -3,6 +3,7 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 import Heading from '@theme/Heading';
 import styles from './index.module.css';
@@ -10,9 +11,9 @@ import styles from './index.module.css';
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <img src="/img/logo.svg" alt="logo" style={{width: 90, marginBottom: 16}} />
+      <header className={clsx('hero hero--primary', styles.heroBanner)}>
+        <div className="container">
+          <img src={useBaseUrl('/img/logo.svg')} alt="logo" style={{width: 90, marginBottom: 16}} />
         <Heading as="h1" className="hero__title">
           Aristotle
         </Heading>
