@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: Caching
+title: 缓存机制
 ---
 
 [//]: # (Copyright 2024 Paion Data)

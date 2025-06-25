@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: 部署
+title: 部署指南
 ---
 
 [//]: # (Copyright 2024 Paion Data)

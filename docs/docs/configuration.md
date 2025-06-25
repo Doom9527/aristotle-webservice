@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: 配置
+title: 配置说明
 ---
 
 [//]: # (Copyright 2024 Paion Data)
