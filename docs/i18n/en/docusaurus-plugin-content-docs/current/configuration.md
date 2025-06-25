@@ -76,7 +76,7 @@ spring:
 ```
 
 :::tip
-For a detailed explanation of the caching mechanism, please refer to the [Caching](./caching.mdx) documentation.
+For a detailed explanation of the caching mechanism, please refer to the [Caching](./caching.md) documentation.
 :::
 
 [Aristotle]: https://github.com/paion-data/aristotle/
