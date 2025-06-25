@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: 部署指南
+title: 应用部署
 ---
 
 [//]: # (Copyright 2024 Paion Data)
@@ -17,108 +17,108 @@ title: 部署指南
 [//]: # (See the License for the specific language governing permissions and)
 [//]: # (limitations under the License.)
 
-本节介绍如何在生产环境部署 [Aristotle]。
+本节介绍如何在服务器上部署 [Aristotle] 服务。
 
-生产部署准备
-----------------------
+### 1. 环境准备
+
+部署前，请确保服务器已安装以下软件：
+
+- **Java 17**: 用于运行应用。
+- **Maven**: 用于构建项目（如果需要在服务器上构建）。
+- **Docker & Docker Compose**: 用于容器化部署（推荐）。
 
 :::note
-
-假设你使用的是 Ubuntu 22.04+ 服务器进行部署。
-
+我们假设服务器环境为 `Ubuntu 22.04+`。关于 Java 和 Maven 的安装，请参考 [本地开发环境设置](./setup.md) 中的步骤。
 :::
 
-### 安装 JDK 17
+### 2. 构建与打包
+
+首先，克隆代码仓库并执行 Maven 打包命令。你需要提供数据库相关的环境变量来完成打包。
 
 ```bash
-sudo apt update
-sudo apt install openjdk-17-jdk
-```
+# 1. 克隆仓库
+git clone git@github.com:Doom9527/aristotle-webservice.git
+cd aristotle-webservice
 
-如果你在输入以下命令后看到类似输出，说明安装成功：
-
-```bash
-$ java -version
-openjdk version "17.0.11" 2024-04-16
-OpenJDK Runtime Environment (build 17.0.11+9-Ubuntu-120.04.2)
-OpenJDK 64-Bit Server VM (build 17.0.11+9-Ubuntu-120.04.2, mixed mode, sharing)
-```
-
-### 安装 Maven
-
-```bash
-sudo apt install maven
-```
-
-如果你在输入以下命令后看到类似输出，说明安装成功：
-
-```bash
-$ mvn -version
-Apache Maven 3.6.3
-Maven home: /usr/share/maven
-Java version: 17.0.11, vendor: Ubuntu, runtime: /usr/lib/jvm/java-17-openjdk-amd64
-Default locale: en_US, platform encoding: UTF-8
-OS name: "linux", version: "5.4.0-182-generic", arch: "amd64", family: "unix"
-```
-
-在上述示例中，Maven 已经使用了正确的 JDK，因此无需额外设置 JAVA_HOME。但如果你希望显式指定 JAVA_HOME，或在有多个 JDK 安装时确保 Maven 始终使用 JDK 17，可以在 shell 配置文件（如 .bashrc、.zshrc 或 .profile）中添加如下内容：
-
-```bash
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-```
-
-打包 Aristotle
-----------------------
-
-```bash
-git clone https://github.com/paion-data/aristotle.git
-cd aristotle
-
+# 2. 设置数据库环境变量 (用于运行测试，如果跳过测试则非必须)
 export NEO4J_URI=YOUR_NEO4J_URI
 export NEO4J_USERNAME=YOUR_NEO4J_USERNAME
 export NEO4J_PASSWORD=YOUR_NEO4J_PASSWORD
 export NEO4J_DATABASE=YOUR_NEO4J_DATABASE
 
+# 3. 执行打包
+# -Dmaven.test.skip=true 会跳过单元测试，加快打包速度
 mvn clean package -Dmaven.test.skip=true
 ```
 
-[Aristotle] 基于 [Springboot](https://spring.io/projects/spring-boot) 构建，内置 Web 容器，使用 Maven 打包为 jar 文件。
+命令成功后，你会在 `target/` 目录下找到 `Aristotle-1.0-SNAPSHOT.jar` 文件。
 
-启动 Aristotle
-----------------------
+### 3. 部署方式
+
+我们提供两种推荐的部署方式。
+
+#### 方式一：Java Jar 包直接运行
+
+这是最基础的部署方式。
 
 ```bash
 java -jar target/Aristotle-1.0-SNAPSHOT.jar
 ```
 
-Web 服务将运行在 **8080** 端口。
+**配置管理**:
 
-### 获取 OpenAPI 文档
+你可以通过在命令前追加环境变量来覆盖 `application.yaml` 中的默认配置。
 
-你可以通过 **http://localhost:8080/doc.html** 访问 OpenAPI 文档。该文档基于 __Swagger 2__ 并由 __Knife4J__ 增强。
+```bash
+# 覆盖数据库配置和服务器端口
+export SPRING_DATA_NEO4J_URI=bolt://prod-neo4j:7687
+export SPRING_DATA_NEO4J_USERNAME=prod_user
+export SPRING_DATA_NEO4J_PASSWORD=prod_password
+export SERVER_PORT=8080
 
-故障排查
-----------------------
-
-### 启动 Aristotle 报 "Failed to execute CommandLineRunner" 错误
-
-对于 Neo4J 数据库，Aristotle 会在首次连接数据库时自动
-[创建若干数据库约束](https://github.com/paion-data/aristotle/blob/master/src/main/java/com/paiondata/aristotle/config/ConstraintInitializer.java)。如果 [启动](#starting-aristotle) 时出现如下报错：
-
-```text
-java.lang.IllegalStateException: Failed to execute CommandLineRunner
-	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:774) ~[spring-boot-2.7.3.jar!/:2.7.3]
-	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:755) ~[spring-boot-2.7.3.jar!/:2.7.3]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:315) ~[spring-boot-2.7.3.jar!/:2.7.3]
-	...
-Caused by: org.neo4j.driver.exceptions.DatabaseException: Unable to create Constraint( name='constraint_1c8dc611', type='UNIQUENESS', schema=(:User {oidcid}) ):
-Both Node(516397) and Node(517024) have the label `User` and property `oidcid` = 'user42fd5D645'. Note that only the first found violation is shown.
-	at org.neo4j.driver.internal.util.Futures.blockingGet(Futures.java:111) ~[neo4j-java-driver-4.4.9.jar!/:4.4.9-e855bcc800deff6ddcf064c822314bb5c8d08c53]
-	at org.neo4j.driver.internal.InternalTransaction.run(InternalTransaction.java:58) ~[neo4j-java-driver-4.4.9.jar!/:4.4.9-e855bcc800deff6ddcf064c822314bb5c8d08c53]
-	at org.neo4j.driver.internal.AbstractQueryRunner.run(AbstractQueryRunner.java:34) ~[neo4j-java-driver-4.4.9.jar!/:4.4.9-e855bcc800deff6ddcf064c822314bb5c8d08c53]
-	...
+java -jar target/Aristotle-1.0-SNAPSHOT.jar
 ```
 
-很可能是 Neo4J 数据库中已存在部分数据，导致约束无法创建。建议清空数据库后重新启动 Aristotle。
+:::tip[环境变量命名]
+注意 Spring Boot 官方推荐的环境变量格式，例如 `spring.data.neo4j.uri` 对应的环境变量是 `SPRING_DATA_NEO4J_URI`。
+:::
+
+#### 方式二：使用 Docker Compose 部署 (推荐)
+
+这是在生产环境中推荐的部署方式，能够方便地管理应用和其依赖（如 Neo4j 数据库）。
+
+项目根目录下的 `docker-compose.yml` 和 `Dockerfile` 已经为您准备好了一切。
+
+```bash
+# 在项目根目录下执行
+# -d 参数表示在后台运行
+docker-compose up -d --build
+```
+
+`--build` 参数会强制重新构建镜像，确保使用的是最新的代码。
+
+**配置管理**:
+
+直接修改 `docker-compose.yml` 文件中的 `environment` 部分，即可完成服务配置。
+
+### 4. 服务访问
+
+服务启动后：
+
+- **应用端口**: 默认为 `8080`。
+- **API 文档**: 访问 `http://<服务器IP>:8080/doc.html` 查看 OpenAPI (Swagger) 文档。
+- **健康检查**: 访问 `http://<服务器IP>:8080/actuator/health` 查看应用健康状态。
+
+### 5. 故障排查
+
+**问题：启动时报 "Failed to execute CommandLineRunner" 或 "constraint" 相关错误**
+
+```text
+Caused by: org.neo4j.driver.exceptions.DatabaseException: Unable to create Constraint ...
+```
+
+**原因**: 服务在首次启动时会自动在 Neo4j 数据库中创建唯一性约束。如果你的数据库中已经存在不符合约束的数据（例如，两个用户节点有相同的 `oidcid`），则会创建失败并报错。
+
+**解决方案**: 建议清空数据库中的数据，然后重启服务。
 
 [Aristotle]: https://aristotle-ws.com
