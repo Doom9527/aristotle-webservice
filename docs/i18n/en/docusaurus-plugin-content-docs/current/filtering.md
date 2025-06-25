@@ -1,34 +1,28 @@
 ---
 sidebar_position: 4
-title: Filtering
+title: Filtering by Properties
 ---
 
-[//]: # (Copyright 2024 Paion Data)
+# Filtering by Properties
 
-[//]: # (Licensed under the Apache License, Version 2.0 &#40;the "License"&#41;;)
-[//]: # (you may not use this file except in compliance with the License.)
-[//]: # (You may obtain a copy of the License at)
+[Aristotle] provides powerful node filtering capabilities, allowing users to query for nodes that match specific attribute criteria, resulting in more precise and efficient data retrieval.
 
-[//]: # (    http://www.apache.org/licenses/LICENSE-2.0)
+### How It Works
 
-[//]: # (Unless required by applicable law or agreed to in writing, software)
-[//]: # (distributed under the License is distributed on an "AS IS" BASIS,)
-[//]: # (WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.)
-[//]: # (See the License for the specific language governing permissions and)
-[//]: # (limitations under the License.)
+The feature is implemented by sending a `POST` request to the `/graph` endpoint with a `FilterQueryGraphDTO` object in the request body.
 
-# Filtering in Aristotle WS
+#### Request Body Format
 
-Aristotle WS provides powerful filtering capabilities, allowing users to query nodes in the knowledge graph based on specific criteria. This feature enhances data retrieval by enabling targeted searches, thus improving the performance and relevance of results.
+The `FilterQueryGraphDTO` has two main fields:
 
-## How Filters Are Implemented
+1.  `uuid` (string, **required**): The unique identifier of the graph you want to query.
+2.  `properties` (object, **optional**): A key-value map defining the filtering conditions.
+    -   `key`: The node property key.
+    -   `value`: The property value to match.
 
-The filtering functionality is implemented through a Data Transfer Object (DTO) called `FilterQueryGraphDTO`. It includes two main components:
+#### Example Request
 
-1. **uuid**: A unique identifier for the graph, indicating the specific graph to query.
-2. **properties**: A `Map<String, String>` that represents the filtering criteria. Each key-value pair's key corresponds to an attribute of the graph nodes, while the value represents the filtering value for that attribute.
-
-For example, a user can specify the filtering criteria in the following format:
+To query for nodes where the `language` property is `"En"` and the `status` property is `"false"`, the request body would be:
 
 ```json
 {
@@ -40,57 +34,46 @@ For example, a user can specify the filtering criteria in the following format:
 }
 ```
 
-The above request will filter for nodes in the graph where `language` is "En" and `status` is "false".
+### Backend Implementation Logic
 
-## Details of Filtering Logic Implementation
+On the backend, the `getRelationByGraphUuid` method dynamically constructs a [Cypher](https://neo4j.com/developer/cypher/) query based on the request.
 
-In the service layer, the business logic processes this filtering through the `getRelationByGraphUuid` method. This method dynamically constructs the Cypher query based on the provided `uuid` and `properties`:
+Here is the core logic:
 
 ```java
+// Base query to match the graph (g1) and its related nodes (n1, n2) and relationships (r)
 final String cypherQuery = "MATCH (g1:Graph { uuid: $uuid }) "
         + "OPTIONAL MATCH (g1)-[:RELATION]->(n1:GraphNode) "
+        // Append filtering conditions for node n1 if properties are provided
         + (properties != null && !properties.isEmpty() ?
         getFilterProperties(Constants.NODE_ALIAS_N1, properties.entrySet()) : "")
         + " OPTIONAL MATCH (n1)-[r:RELATION]->(n2:GraphNode) "
+        // Append filtering conditions for node n2 if properties are provided
         + (properties != null && !properties.isEmpty() ?
         getFilterProperties(Constants.NODE_ALIAS_N2, properties.entrySet()) : "")
         + " RETURN DISTINCT n1, r, n2";
 ```
 
-Here, the `getFilterProperties` method converts the filtering criteria into appropriate Cypher query snippets. For instance, if `properties` contains `{ "language": "En", "Status": "false" }`, the generated Cypher query will be similar to:
+The `getFilterProperties` method is responsible for converting the `properties` map into a Cypher `WHERE` clause fragment. It iterates over the map entries and builds a string in the format `{ key1: 'value1', key2: 'value2' }`.
+
+For the example request above, the final generated Cypher query would be approximately:
 
 ```cypher
-MATCH (g1:Graph { uuid: $uuid }) 
-OPTIONAL MATCH (g1)-[:RELATION]->(n1:GraphNode { language: 'En', Status: 'false' }) 
-OPTIONAL MATCH (n1)-[r:RELATION]->(n2:GraphNode { language: 'En', Status: 'false' }) 
+MATCH (g1:Graph { uuid: "3e308cd7b15c46bea971b43e090b18d2" })
+OPTIONAL MATCH (g1)-[:RELATION]->(n1:GraphNode { language: 'En', status: 'false' })
+OPTIONAL MATCH (n1)-[r:RELATION]->(n2:GraphNode { language: 'En', status: 'false' })
 RETURN DISTINCT n1, r, n2
 ```
 
-If `properties` is empty or not provided, the query does not perform additional filtering and returns all nodes that meet the criteria.
+If the `properties` field is omitted or is an empty object, no filtering conditions are appended, and the query returns all nodes and relationships in the graph.
 
-## How to Pass Filter Conditions
+:::info[Supported Query Types]
+Currently, property filtering only supports **exact matches**. More complex queries like fuzzy matching or range searches are not yet implemented.
+:::
 
-When sending a filtering request to Aristotle WS, the user must use the POST method and include the graph's `uuid` and `properties` in the request body. For example:
+### Example Response
 
-POST /graph
-Content-Type: application/json
-```json
-{
-  "uuid": "3e308cd7b15c46bea971b43e090b18d2",
-  "properties": {
-  "language": "En",
-  "Status": "false"
-  }
-}
-```
-
-### Parameter Descriptions
-
-1. **uuid**: Required, specifies the unique identifier for the graph to query.
-2. **properties**: Optional, a JSON object representing the filtering conditions as key-value pairs that match node attributes. Multiple attributes can be specified to combine filters.
-
-### Response Example
-If the filtering is successful, the service will return the nodes and relationships that match the criteria. For example, a possible response could look like this:
+A successful request will return a subgraph containing only the nodes and relationships that match the filter criteria.
 
 ```json
 {
@@ -100,27 +83,24 @@ If the filtering is successful, the service will return the nodes and relationsh
     "uuid": "3e308cd7b15c46bea971b43e090b18d2",
     "title": "Language Graph",
     "description": "Language related graph",
-    "createTime": "2024-10-19 16:07:26",
-    "updateTime": "2024-10-19 16:07:26",
     "nodes": [
       {
         "uuid": "2ab78d7c532b41cda028084fd8a5cdd3",
         "properties": {
-          "Status": "false",
+          "status": "false",
           "language": "En",
           "exercitatione9": "reprehenderit tempor minim ad qui"
         },
         "createTime": "2024-10-19 16:07:26",
         "updateTime": "2024-10-19 16:07:26"
       }
+      // ... other matching nodes
     ],
-    "relations": []
+    "relations": [
+      // ... matching relations
+    ]
   }
 }
 ```
 
-## Use Cases for Filtering Functionality
-
-- **UPrecise Data Selection**: The filtering functionality allows quick selection of specific nodes within large graphs, such as filtering active or inactive users or specific language content.
-- **Multi-condition Combination Queries**: The `properties` object supports the combination of multiple conditions, enabling users to filter nodes based on various attributes simultaneously, such as language and status.
-- **Default Return of All Data**: If no `properties` are provided or an empty object is passed, the system will return all nodes and relationship data.
+[Aristotle]: https://github.com/paion-data/aristotle/

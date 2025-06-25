@@ -164,17 +164,3 @@ public class CacheLoaderService {
 通过上述多级缓存与分布式缓存加载机制，Aristotle 能够高效应对大规模知识图谱下的高并发扩展查询与超时问题，极大提升系统的稳定性与响应速度。
 
 如需进一步了解缓存配置与高级用法，请参考相关源码与配置文档。
-
----
-
-如需插入架构图或缓存流程图，可参考原文中的图片引用方式：
-
-```md
-import RedisCache from './img/redis-caching.png';
-
-<div align="center"> 
-    <img src={RedisCache} width="80%"/>
-</div>
-```
-
-如需更详细的代码实现或配置细节，请告知！ 

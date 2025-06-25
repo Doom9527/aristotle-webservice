@@ -165,16 +165,4 @@ Through the above multi-level cache and distributed cache loading mechanism, Ari
 
 For more details on cache configuration and advanced usage, please refer to the relevant source code and configuration documentation.
 
----
 
-To insert architecture diagrams or cache flowcharts, refer to the image import method in the original document:
-
-```md
-import RedisCache from './img/redis-caching.png';
-
-<div align="center"> 
-    <img src={RedisCache} width="80%"/>
-</div>
-```
-
-If you need more detailed code implementation or configuration details, please let us know!

@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: Configuration
+title: Service Configuration
 ---
 
 [//]: # (Copyright 2024 Paion Data)
@@ -17,38 +17,66 @@ title: Configuration
 [//]: # (See the License for the specific language governing permissions and)
 [//]: # (limitations under the License.)
 
-The configurations in this page can be set from several sources in the following order:
+This section describes the main configurations for the [Aristotle] service. All settings are located in the `src/main/resources/application.yaml` file.
 
-1. the [operating system's environment variables]; for instance, an environment variable can be set with
-   `export NEO4J_URI="bolt://db:7687"`
-2. the [Java system properties]; for example, a Java system property can be set using
-   `System.setProperty("NEO4J_URI", "bolt://db:7687")`
-3. a **.yaml** file placed under CLASSPATH. This file can be put under `src/main/resources` source directory with
-   contents, for example, `uri: bolt://db:7687`
+### Configuration Loading Order
 
-Core Properties
----------------
+The system supports multiple configuration sources, which are loaded in the following order of precedence (higher-priority sources override lower-priority ones):
 
-:::note
+1.  **Operating System Environment Variables**: e.g., `export SERVER_PORT=8081`.
+2.  **Java System Properties**: e.g., `java -jar app.jar -Dserver.port=8082`.
+3.  **`application.yaml` File**: The configuration file within the project.
 
-The following configurations can be placed in the properties file called **application.yaml**
+### Core Configurations
 
+The following are the key configuration items in the `application.yaml` file.
+
+#### 1. Server Configuration
+
+```yaml
+server:
+  port: 8080 # Application service port
+```
+
+#### 2. Neo4j Database Configuration
+
+```yaml
+spring:
+  data:
+    neo4j:
+      uri: bolt://localhost:7687
+      database: neo4j
+      username: neo4j
+      password: your_password
+```
+
+-   **`uri`**: The connection URI for your Neo4j database.
+-   **`database`**: The name of the database instance to connect to.
+    -   Since Neo4j 4.x, multiple databases are supported. The Community Edition supports only the default `neo4j` database, while the Enterprise Edition allows for multiple databases. If you are using the Enterprise Edition with a custom database, change this value to your database name.
+-   **`username`**: The database username.
+-   **`password`**: The database password.
+
+#### 3. Cache Configuration
+
+The system supports two levels of caching, Caffeine (local) and Redis (distributed), which can be enabled or disabled independently.
+
+```yaml
+spring:
+  # Caffeine local cache configuration
+  read-cache:
+    enabled: true          # true: enable, false: disable
+    num-subgraphs: 500     # Maximum number of graphs to cache
+
+  # Redis distributed cache configuration
+  redis:
+    enabled: false         # true: enable, false: disable
+    host: 127.0.0.1
+    port: 6379
+    password: your_redis_password
+```
+
+:::tip
+For a detailed explanation of the caching mechanism, please refer to the [Caching](./caching.mdx) documentation.
 :::
 
-- **username**: Persistence DB username (needs have both Read and Write permissions).
-- **password**: The persistence DB user password.
-- **uri**: The persistence DB URL, such as "bolt://db:7687".
-- **database**: The persistence DB database name:
-
-There are two editions of self-managed Neo4j to choose from, the Community Edition (CE) and the Enterprise Edition (EE). The Enterprise Edition includes all that Community Edition offers, plus extra enterprise requirements such as backups, clustering, and failover capabilities.
-
-After Neo4j is updated to 4.× and the service is started, two libraries are available by default, as shown in the following figure. The directory is also changed to data/databases/, where the neo4j database is the default library after login. [Official introduction](https://neo4j.com/docs/operations-manual/4.0/introduction/):
-
-- **system**: System database, containing metadata for database management systems and security configurations;
-- **neo4j**: The default database, a single database of user data. Its default name is neo4j.
-
-If you are using the EE and have created multiple databases, you need to modify the `database` to the name of the database you created.
-
-[Java system properties]: https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html
-
-[operating system's environment variables]: https://docs.oracle.com/javase/tutorial/essential/environment/env.html
+[Aristotle]: https://github.com/paion-data/aristotle/
