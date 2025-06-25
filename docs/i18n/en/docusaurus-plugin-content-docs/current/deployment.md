@@ -37,8 +37,8 @@ First, clone the repository and run the Maven package command. You may need to p
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/paion-data/aristotle.git
-cd aristotle
+git clone git@github.com:Doom9527/aristotle-webservice.git
+cd aristotle-webservice
 
 # 2. Set database environment variables (optional, for running tests)
 export NEO4J_URI=YOUR_NEO4J_URI

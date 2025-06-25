@@ -96,8 +96,8 @@ Please follow the [official instructions](https://docs.docker.com/desktop/instal
 Once everything is set up, clone the source code to your local machine:
 
 ```bash
-git clone git@github.com:paion-data/aristotle.git
-cd aristotle
+git clone git@github.com:Doom9527/aristotle-webservice.git
+cd aristotle-webservice
 ```
 
 [Aristotle]: https://github.com/paion-data/aristotle/

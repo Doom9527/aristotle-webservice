@@ -5,7 +5,7 @@ title: 本地开发环境设置
 
 [//]: # (Copyright 2024 Paion Data)
 
-[//]: # (Licensed under the Apache License, Version 2.0 (the "License");)
+[//]: # (Licensed under the Apache License, Version 2.0 &#40;the "License"&#41;;)
 [//]: # (you may not use this file except in compliance with the License.)
 [//]: # (You may obtain a copy of the License at)
 
@@ -104,8 +104,8 @@ source ~/.zshrc
 一切就绪后，克隆项目源代码到本地：
 
 ```bash
-git clone git@github.com:paion-data/aristotle.git
-cd aristotle
+git clone git@github.com:Doom9527/aristotle-webservice.git
+cd aristotle-webservice
 ```
 
 [Aristotle]: https://github.com/paion-data/aristotle/

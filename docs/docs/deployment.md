@@ -37,8 +37,8 @@ title: 应用部署
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/paion-data/aristotle.git
-cd aristotle
+git clone git@github.com:Doom9527/aristotle-webservice.git
+cd aristotle-webservice
 
 # 2. 设置数据库环境变量 (用于运行测试，如果跳过测试则非必须)
 export NEO4J_URI=YOUR_NEO4J_URI
