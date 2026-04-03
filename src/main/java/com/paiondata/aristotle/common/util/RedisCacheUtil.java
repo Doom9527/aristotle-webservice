@@ -16,6 +16,8 @@
 package com.paiondata.aristotle.common.util;
 
 import com.paiondata.aristotle.common.base.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,6 +25,7 @@ import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -37,6 +40,8 @@ import java.util.stream.Stream;
 @Component
 @ConditionalOnProperty(name = "spring.redis.enabled", havingValue = "true")
 public class RedisCacheUtil {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RedisCacheUtil.class);
 
     /**
      * Indicates whether caching is enabled or disabled.
@@ -84,8 +89,15 @@ public class RedisCacheUtil {
             return null;
         }
 
-        ValueOperations<String, T> operation = redisTemplate.opsForValue();
-        return operation.get(key);
+        try {
+            ValueOperations<String, T> operation = redisTemplate.opsForValue();
+            return operation.get(key);
+        } catch (SerializationException e) {
+            LOG.warn("Failed to deserialize cached value for key: {}, deleting stale cache entry. Error: {}",
+                    key, e.getMessage());
+            redisTemplate.delete(key);
+            return null;
+        }
     }
 
     public void deleteObject(final String uuid) {

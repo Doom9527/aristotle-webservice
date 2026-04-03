@@ -204,6 +204,9 @@ public class NodeMapperImpl implements NodeMapper {
 
                 while (result.hasNext()) {
                     final Record record = result.next();
+                    if (record.get(Constants.NODE_ALIAS_N).isNull()) {
+                        continue;
+                    }
                     final NodeVO n = nodeExtractor.extractNode(record.get(Constants.NODE_ALIAS_N));
                     nodes.add(n);
                     totalCount++;
