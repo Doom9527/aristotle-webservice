@@ -64,7 +64,10 @@ public class CaffeineCacheUtil {
         if (cacheEnabled) {
             final GraphVO cachedGraphVO = graphCache.getIfPresent(key);
             if (cachedGraphVO != null) {
-                LOG.info(Message.RETURNING_CACHED_GRAPHVO_FOR_UUID, key);
+                LOG.info("Returning cached graphVO for UUID: {}", key);
+                LOG.info("Cached nodes size: {}, relations size: {}",
+                        cachedGraphVO.getNodes() != null ? cachedGraphVO.getNodes().size() : "null",
+                        cachedGraphVO.getRelations() != null ? cachedGraphVO.getRelations().size() : "null");
                 return Optional.of(cachedGraphVO);
             }
         }
