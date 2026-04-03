@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[903],{1912:e=>{e.exports=JSON.parse('{"blogBasePath":"/aristotle-webservice/en/blog","blogTitle":"Blog","authorsListPath":"/aristotle-webservice/en/blog/authors"}')}}]);
