@@ -85,7 +85,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
+            <version>5.8.29</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -97,21 +97,21 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
-            <version>${version.springfox}</version>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
-            <version>${version.springfox}</version>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-spring-boot-starter -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-boot-starter</artifactId>
-            <version>${version.knife4j}</version>
+            <version>3.0.3</version>
         </dependency>
 
         <!-- Neo4j Driver -->
@@ -174,7 +174,7 @@
         <dependency>
             <groupId>org.neo4j.test</groupId>
             <artifactId>neo4j-harness</artifactId>
-            <version>5.23.0</version>
+            <version>5.26.7</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
